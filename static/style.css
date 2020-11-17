@@ -1,0 +1,61 @@
+
+#start{
+	background-color: green;
+}
+
+#stop{
+	background-color: red;
+}
+
+input[type="button"]{
+	background-color: yellow;
+	border: 2px solid;
+	border-radius: 3px;
+}
+table.BgAnd2Way {
+	border-collapse: collapse;
+	text-align: left;
+	line-height: 1.5;
+	border-top: 1px solid #ccc;
+	border-bottom: 1px solid #ccc;
+	margin: 20px 10px;
+	width: 100%;
+}
+table.BgAnd2Way thead th {
+	width: auto;
+	padding: 10px;
+	font-weight: bold;
+	vertical-align: top;
+	color: #fff;
+	background: #e7708d;
+	margin: 20px 10px;
+}
+table.BgAnd2Way tbody th {
+	width: auto;
+	padding: 10px;
+}
+table.BgAnd2Way td {
+	width: auto;
+	padding: 10px;
+	vertical-align: top;
+}
+table.BgAnd2Way .even {
+	background-color: #fdf3f5;
+}
+
+table.BgAnd2Way .mine {
+	background-color: #9088d4;
+}
+
+table.BgAnd2Way .developer {
+	background-color: #16a596;
+}
+a {
+	text-decoration: none;
+}
+a:link {
+	color: #703e9e;
+}
+a:visited {
+	color: #703e9e;
+}

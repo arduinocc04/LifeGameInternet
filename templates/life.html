@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet" type="text/css">
+    <script src="{{ url_for('static', filename='source.js') }}"></script>
+    <noscript>Good choice</noscript>
+</head>
+
+<body>
+    <canvas id="generalCanvas" width="0" height="0"></canvas>
+    <br><br>
+<!--
+    <input id="red" type="button" onclick="set(0);" value="red"></input>
+    <input id="yellow" type="button" onclick="set(1)" ; value="green"></input>
+    <input id="blue" type="button" onclick="set(2);" value="blue"></input>
+    <input id="black" type="button" onclick="set(3);" value="black"></input>
+-->
+    <input id="clear" type="button" onclick="clearCanvas();" value="clear"></input>
+<!--
+    <input id="updateMax" type="number"></input>
+    <input id="setMax" type="button" onclick="setMax()"; value="update MaxCnt!"></input>
+    <p>cnt: </p>
+    <p id="cnt">0</p>
+    <p>maxCnt: </p>
+    <p id="maxCnt">0</p>
+    <p>mode: </p>
+    <p id="mode">stopped</p>
+    <p id="nColor"></p>
+    <p>frame: </p>
+    <p id="frame"></p>
+    <p>Max Cell Count</p>
+    <p id="mCellCnt">0</p>
+--> 
+    <input id="mCellCnt" type="hidden" value="">
+    <input id="start" type="button" onclick="start();" value="start"></input>
+    <input id="stop" type="button" onclick="stop();" value="stop"></input>
+</body>
+
+</html>

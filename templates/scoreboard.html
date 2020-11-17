@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset = "utf-8">
+    <title>Score Board</title>
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+	<script type="text/javascript">
+		function findMine(e) {
+			var el = document.getElementById("mine");
+			var rect = el.getBoundingClientRect();
+			window.scrollTo({top:rect.y, left:0, behavior: 'smooth'});
+		}
+		window.onload = function() {
+			/*
+			var el = document.getElementById('mine');
+			var btn = document.createElement("button")
+			btn.setAttribute("onclick", "window.scrollTo({top:0, left:0, behavior: 'smooth'})")
+			btn.setAttribute("style", )
+			btn.textContent = "맨 위로";
+			el.appendChild(btn);
+			*/
+			findMine(event);
+		}
+		function goUp(e) {
+			window.scrollTo({top:0, left:0, behavior: 'smooth'});
+		}
+		function seeImg(name, time, score, rank) {
+			window.location.href = "/image?name=" + name + "&originalName=" + "{{name}}" + "&time=" + time + "&score=" + score + "&rank=" + rank;
+		}
+	</script>
+</head>
+<body>
+	<a href={{ url_for('game') }}>게임으로 돌아가기</a>
+	<button onclick="findMine(event)">내 점수 보기</button>
+	<p>자신의 점수를 클릭하면 맨 위로 돌아갈 수 있습니다.</p>
+	<table class="BgAnd2Way">
+		<thead>
+			<th>순위</th>
+			<th>시간</th>
+			<th>닉네임</th>
+			<th>점수</th>
+		</thead>
+		<tbody>
+			{% for i in range(n) %}
+			{% if scores[i][0][1] == name %}
+			<tr id="mine" class="mine" onclick="goUp(event)">
+			{% elif scores[i][0][1] == "10222 조다니엘" %}
+			<tr class="developer" onclick='seeImg("{{scores[i][0][1]}}", "{{scores[i][0][0]}}", "{{scores[i][0][2]}}","{{ scores[i][1] }}")'>
+			{% elif i%2== 0 %}
+			<tr class="even" onclick='seeImg("{{scores[i][0][1]}}", "{{scores[i][0][0]}}", "{{scores[i][0][2]}}","{{ scores[i][1] }}")'>
+			{% else %}
+			<tr onclick='seeImg("{{scores[i][0][1]}}", "{{scores[i][0][0]}}", "{{scores[i][0][2]}}","{{ scores[i][1] }}")'>
+			{% endif %}
+				<th>{{ scores[i][1] }}</th>
+				<td>{{scores[i][0][0]}}</td>
+				<td>{{scores[i][0][1]}}</td>
+				<td>{{scores[i][0][2]}}</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+	<button onclick="goUp(event)">맨 위로</button>
+</body>
+</html>
