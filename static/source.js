@@ -85,10 +85,12 @@ function update(){
 
 function end() {
 	stop();
+	var mCellCnt = parseInt(document.getElementById("mCellCnt").value)
 	var score = (5000 * mCellCnt * mCellCnt * Math.sqrt(frame))/Math.pow(delayedTime, Math.SQRT2);
+	console.log(score);
 	var data = new Object();
 	data.name = name;
-	data.mCellCnt = parseInt(document.getElementById("mCellCnt").value);
+	data.mCellCnt = mCellCnt;
 	data.frame = frame;
 	data.delayedTime = delayedTime;
 	data.score = score;
