@@ -6,6 +6,10 @@ from time import ctime
 import base64
 app = Flask(__name__)
 
+@app.route('/')
+def main():
+    return redirect('game')
+
 @app.route('/game')
 def game():
     return render_template('life.html')
@@ -67,4 +71,4 @@ def showImage():
     return render_template('image.html', targetName = name, originalName=originalName, time=time, score=score, rank=rank, imgName=f'image/{name}.jpg', mCellCnt=mCellCnt, frame=frame, delayedTime=delayedTime)
 
 if __name__ == "__main__":
-    app.run(host='localhost', port = 8000)
+    app.run(host='0.0.0.0', port = 8000)

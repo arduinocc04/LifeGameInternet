@@ -13,8 +13,8 @@ var prevNSameCnt = 0;
 let startTime = 0;
 var delayedTime = 0;
 var image;
-(() => {
-	let ca = this.document.getElementById("generalCanvas");
+window.onload = function() {
+	var ca = document.getElementById("generalCanvas");
 	ca.height = sizes[le - 1] + wi + 1;
 	ca.width = sizes[le -1] + wi + 1;
 	let ctx = ca.getContext("2d");
@@ -44,14 +44,14 @@ var image;
 	//document.getElementById("cnt").textContent = cnt;
 	//document.getElementById("nColor").textContent = colors[current];
 	clearCanvas();
-})();
+}
 
 
 
 function start(){
 	image = document.getElementById("generalCanvas").toDataURL();
 	if(maxCnt != cnt) {
-		alert(maxCnt + "개를 채우세요!" + "현재 " + cnt + "개 입니다.");
+		alert(maxCnt + "개를 채우세요!" + "현재 " + (maxCnt - cnt) + "개 남았습니다.");
 		return;
 	}
 	var today = new Date();
@@ -152,7 +152,6 @@ function scan(){
 		for(c in mat[r]){
 			current = checkNears(r, c);
 			if(mat[r][c]){
-				mCellCnt++;
 				if(current < 2 || current > 3){
 					tmp[r][c] = false;
 				}
@@ -228,7 +227,6 @@ function clearCanvas(){
 	frame = 0;
 	//document.getElementById("frame").textContent = frame;
 	document.getElementById("mCellCnt").value = 0;
-	mCellCnt = 0;
 	var today = new Date();
 	startTime = today.getTime();
 	stop();
