@@ -102,7 +102,7 @@ function end() {
 	request.setRequestHeader('Content-Type', 'application/json');
 	request.send(jsonData)
 	request.onload = function() {
-		if(request.status == 200 || request.status == 201) window.location.href = "/scoreboard?name=" + name;;
+		if(request.status == 200 || request.status == 201) window.location.href = "/scoreboard?name=" + name;
 	}
 }
 

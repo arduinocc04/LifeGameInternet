@@ -1,4 +1,5 @@
 import sqlite3
+from sqlite3.dbapi2 import connect
 from time import ctime
 import typing
 class DbManager:
@@ -64,6 +65,92 @@ class DbManager:
         self.c.close()
         self.conn.close()
 
+class UserManager:
+    def __init__(self) -> None:
+        self.conn = sqlite3.connect('User.db')
+        self.c = self.conn.cursor()
+
+    def makeDb(self) -> None:
+        query = """
+        CREATE TABLE "Users" (
+        	"ID"	TEXT,
+        	"PW"	TEXT NOT NULL,
+        	"Salt"	TEXT NOT NULL,
+        	"NickName"	TEXT NOT NULL,
+        	"Name"	TEXT NOT NULL,
+        	"StudentId"	TEXT NOT NULL UNIQUE,
+        	"ShowNS"	INTEGER NOT NULL,
+        	"MaxScore"	REAL DEFAULT 0,
+        	PRIMARY KEY("ID")
+        );
+        """
+        self.c.execute(query)
+        self.conn.commit()
+
+    def deleteAll(self) -> None:
+        query = "DROP TABLE Users"
+        self.c.execute(query)
+        self.conn.commit()
+    
+    def deleteUser(self, uid:str) -> None:
+        query = f'DELETE FROM Users WHERE ID = "{uid}"'
+        self.c.execute(query)
+        self.conn.commit()
+
+    def uploadUser(self, uid:str, pw:str, salt:str, nickName:str, name:str, studentId:int, showNS:int, MaxScore:float=0) -> None:
+        query = f'INSERT INTO Users (ID, PW, Salt, NickName, Name, StudentId, ShowNS, MaxScore) VALUES ("{uid}", "{pw}", "{salt}", "{nickName}", "{name}", {studentId}, {showNS}, {MaxScore})'
+        self.c.execute(query)
+        self.conn.commit()
+
+    def updatePw(self, uid:str, pw:str) -> None:
+        query = f'UPDATE Users SET PW = "{pw}" WHERE ID = "{uid}"'
+        self.c.execute(query)
+        self.conn.commit(query)
+
+    def updateNickName(self, uid:str, nickname:str) -> None:
+        query = f'UPDATE Users SET NickName = "{nickname}" WHERE ID = "{uid}"'
+        self.c.execute(query)
+        self.conn.commit()
+
+    def updateStudentId(self, uid:str, studentId:int) -> None:
+        query = f'UPDATE Users SET StudentId = {studentId} WHERE ID = "{uid}"'
+        self.c.execute(query)
+        self.conn.commit()
+
+    def updateMaxScore(self, uid:str, score:float) -> None:
+        query = f'UPDATE Users SET MaxScore = {score} WHERE ID = "{uid}"'
+        self.c.execute(query)
+        self.conn.commit()
+
+    def getPw(self, uid:str) -> str:
+        query = f'SELECT PW FROM Users WHERE ID = "{uid}"'
+        self.c.execute(query)
+        self.conn.commit()
+        return self.c.fetchone()[0]
+
+    def getSalt(self, uid:str) -> str:
+        query = f'SELECT Salt FROM Users WHERE ID = "{uid}"'
+        self.c.execute(query)
+        self.conn.commit()
+        return self.c.fetchone()[0]
+
+    def getInfo(self, uid:str) -> typing.Tuple:
+        query = f'SELECT * FROM Users WHERE ID = "{uid}"'
+        self.c.execute(query)
+        self.conn.commit()
+        return self.c.fetchone()
+
+    def getNNameMScoreAll(self) -> typing.List:
+        query = 'SELECT NickName, MaxScore FROM Users'
+        self.c.execute(query)
+        self.conn.commit()
+        return self.c.fetchall()
+    
+    def closeDb(self) -> None:
+        self.conn.commit()
+        self.c.close()
+        self.conn.close()
+    
 if __name__ == '__main__':
     import time
     a = DbManager()
