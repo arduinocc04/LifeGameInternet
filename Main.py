@@ -191,7 +191,7 @@ def showImage():
     return render_template('image.html', targetName = name, originalName=originalName, time=time, score=score, rank=rank, imgName=f'image/{name}.jpg', mCellCnt=mCellCnt, frame=frame, delayedTime=delayedTime)
 
 @app.route('/imageScore', methods = ['GET'])
-def showImage():
+def showImageScore():
     name = request.args.get('name')
     gid = request.args.get('gid')
     originalName = request.args.get('originalName')
