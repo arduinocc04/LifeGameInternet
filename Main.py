@@ -160,4 +160,4 @@ def showImage():
 if __name__ == "__main__":
     import setup
     #setup.setup()
-    sio.run(app, host='localhost', port = 8000)
+    sio.run(app, host='0.0.0.0', port = 8000)
