@@ -35,6 +35,7 @@ def addUser():
     pw = jsonData['pw']
     showNs = 1 if jsonData['showNs'] == 'true' else 0
     UsMan.uploadUser(uid, pw, salt, nickName, name, studentId, showNs)
+    UsMan.closeDb()
     return redirect('showProfile', uid=uid)
 
 @app.route('/profile', methods=['GET'])
@@ -42,6 +43,7 @@ def showProfile():
     uid = request.args.get('uid')
     UsMan = DbManager.UserManager()
     tmp = UsMan.getInfo()
+    UsMan.closeDb()
     if tmp == None: return render_template('profileErr.html')
     _, _, _, nickName, name, studentId, showNs, maxScore = tmp
     add = ""
