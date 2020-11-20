@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script type="text/javascript">
+    function signin() {
+      id = document.getElementById('uid').value;
+      pw = document.getElementById('pw').value;
+      if(id == "") {
+        alert("아이디를 입력하십시오");
+        return false;
+      }
+      if(pw == "") {
+        alert("비밀번호를 입력하십시오");
+        return false;
+      }
+      var data = new Object();
+      data.uid = id;
+      data.pw = pw;
+      var jsonData = JSON.stringfy(data);
+      const url = '/signinUser';
+      var request = new XMLHttpRequest();
+      request.open('POST', url);
+      request.sentRequestHeader('Content-Type', 'application/json');
+      request.onload = function() {
+        if(request.status == 200 || request.status == 201) window.location.href = "/profile?uid=" + data.uid;
+        }
+    }
+  </script>
+</head>
+<body>
+  <div>
+    <fieldset>
+      <input id="uid" type="text>
+      <input id="pw" type="password">
+    </fieldset>
+    <button id="signin" onclick="signin()">로그인 하기</button>
+  </div>
+</body>
+</html>
