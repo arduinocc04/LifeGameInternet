@@ -152,7 +152,7 @@ class UserManager:
 
 class GameManger:
     def __init__(self) -> None:
-        self.conn = sqlite3.connect('Games.db')
+        self.conn = sqlite3.connect('Game.db')
         self.c = self.conn.cursor()
 
     def makeDb(self)-> None:
@@ -178,7 +178,14 @@ class GameManger:
         self.conn.commit()
 
     def uploadGame(self, gid:str, players:str, time:str) -> None:
-        query = f'INSERT INTO Games (Gid, Players, MadeTime) VALUES ("{gid}", "{players}", "{time}"'
+        query = f'INSERT INTO Games (Gid, Players, MadeTime) VALUES ("{gid}", "{players}", "{time}")'
+        self.c.execute(query)
+        self.conn.commit()
+
+    def appendPlayer(self, gid:str, player:str) -> None:
+        _, pre, _ = self.getInfo(gid)
+        if pre == "": query = f'UPDATE Games SET players = "{player}" WHERE Gid = "{gid}"'
+        else: query = f'UPDATE Games SET players = "{pre},{player}" WHERE Gid = "{gid}"'
         self.c.execute(query)
         self.conn.commit()
     
@@ -187,7 +194,11 @@ class GameManger:
         self.c.execute(query)
         self.conn.commit()
         return self.c.fetchone()
-    
+
+    def closeDb(self) -> None:
+        self.conn.commit()
+        self.c.close()
+        self.conn.close()   
 if __name__ == '__main__':
     import time
     a = DbManager()

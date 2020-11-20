@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, session
+from flask import json
 from flask_socketio import SocketIO, emit
 import DbManager
 import ntplib
@@ -89,17 +90,49 @@ def genQrcode():
     tmp = '' #8자리 랜덤 문자열
     for _ in range(8):
         tmp += random.choice(string.ascii_letters)
-    return render_template('qr.html', url = 'http://www.arduinocc04.live:8080' + url_for('game', gid=tmp))
+    cli = ntplib.NTPClient()
+    now = ctime(cli.request("kr.pool.ntp.org").tx_time + 32400)
+    GmMan = DbManager.GameManger()
+    GmMan.uploadGame(tmp, '', now)
+    GmMan.closeDb()
+    return render_template('qr.html', url = "www.arduinocc04.live:8000" + url_for('game', gid=tmp))
 
-@app.route('/scoreboard', methods=['POST'])
+@app.route('/scoreboard', methods=['GET'])
 def showScoreboard():
-    pass
+    GmMan = DbManager.GameManger()
+    DbMan = DbManager.DbManager()
+    gid = request.args.get('gid')
+    name = request.args.get('name')
+    tmp = GmMan.getInfo(gid)
+    if tmp == None: return redirect(url_for('error'))
+    _, players, t = tmp
+    players = players.split(',')
+    tmp = [DbMan.getTNS(p) for p in players]
+    tmp.sort(key = lambda x:-x[2])
+    prev = -1
+    prevPlace = -1
+    for i in range(len(tmp)):
+        tmp[i] = (tmp[i], (prevPlace if prev == tmp[i][2] else i+1),)
+        prev = tmp[i][0][2]
+        prevPlace = tmp[i][1]
+    return render_template('leaderboard.html', scores=tmp, name=name, n = len(tmp))
+
 
 @app.route('/game', methods=['GET'])
 def game():
     gid = request.args.get('gid')
     return render_template('life.html', gid=gid)
 
+@app.route('/appendUser', methods=['GET'])
+def appendUser():
+    print('Hi!')
+    gid = request.args.get('gid')
+    uid = request.args.get('uid')
+    print(f'gid:{gid}uid:{uid}')
+    GmMan = DbManager.GameManger()
+    GmMan.appendPlayer(gid, uid)
+    GmMan.closeDb()
+    return redirect(url_for('showScoreboard', gid=gid, name=uid))
 
 @app.route('/wating')
 def wating():
