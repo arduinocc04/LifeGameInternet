@@ -47,12 +47,12 @@ def showProfile():
     if tmp == None: return render_template('profileErr.html')
     _, _, _, nickName, name, studentId, showNs, maxScore = tmp
     add = ""
-    if not showNs:
-        if session['id'] == uid:
-            add = "(not visible)"
-        else:
-            name="비밀"
-            studentId="비밀"
+    #if not showNs:
+        #if session['id'] == uid:
+       #     add = "(not visible)"
+        #else:
+            #name="비밀"
+           # studentId="비밀"
     return render_template('profile.html', uid=uid, studentId=studentId, name=name, nickName=nickName, maxScore=maxScore, add=add)
 
 
