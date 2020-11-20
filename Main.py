@@ -91,7 +91,7 @@ def genQrcode():
         tmp += random.choice(string.ascii_letters)
     return render_template('qr.html', url = 'http://www.arduinocc04.live:8080' + url_for('game', gid=tmp))
 
-@app.route('scoreboard', methods=['POST'])
+@app.route('/scoreboard', methods=['POST'])
 def showScoreboard():
     pass
 
