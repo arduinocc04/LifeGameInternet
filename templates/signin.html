@@ -5,6 +5,7 @@
     function signin() {
       id = document.getElementById('uid').value;
       pw = document.getElementById('pw').value;
+      var form = document.forms['login'];
       if(id == "") {
         alert("아이디를 입력하십시오");
         return false;
@@ -13,28 +14,19 @@
         alert("비밀번호를 입력하십시오");
         return false;
       }
-      var data = new Object();
-      data.uid = id;
-      data.pw = pw;
-      var jsonData = JSON.stringfy(data);
-      const url = '/signinUser';
-      var request = new XMLHttpRequest();
-      request.open('POST', url);
-      request.sentRequestHeader('Content-Type', 'application/json');
-      request.onload = function() {
-        if(request.status == 200 || request.status == 201) window.location.href = "/profile?uid=" + data.uid;
-        }
+      form.submit();
     }
   </script>
 </head>
 <body>
   <a href="{{url_for('signup')}}">회원가입 하기</a>
-  <div>
+  <form action="/signinUser" method="POST" name="login">
     <fieldset>
-      <input id="uid" type="text>
-      <input id="pw" type="password">
+      <legend>계정 정보 입력</legend>
+      ID: <input id="uid" type="text" name="uid"><br>
+      PW: <input id="pw" type="password" name="pw">
     </fieldset>
     <button id="signin" onclick="signin()">로그인 하기</button>
-  </div>
+  </form>
 </body>
 </html>

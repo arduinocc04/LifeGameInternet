@@ -49,18 +49,22 @@ def signin():
 @app.route('/signinUser', methods=['POST'])
 def login():
     UsMan = DbManager.UserManager()
-    jsonData = request.get_json()
-    uid = jsonData['uid']
-    pw = jsonData['pw']
-    salt = UsMan.getSalt(uid)
-    res = UsMan.getPw(uid)
-    if salt != None:
+    uid = request.form['uid']
+    pw = request.form['pw']
+    tmp = UsMan.getInfo(uid)
+    UsMan.closeDb()
+    if tmp != None:
+        _, res, salt, nickName, name, studentId, showNs, maxScore = tmp
         pw = pw + salt
-        if res != None:
-            result = hashlib.sha256(pw.encode()).hexdigest()
-            if result == res:
-                session['uid'] = uid
-                return redirect(url_for('showProfile', uid=uid))
+        result = hashlib.sha256(pw.encode()).hexdigest()
+        if result == res:
+            session['uid'] = uid
+            session['nickName'] = nickName
+            session['name'] = name
+            session['studentId'] = studentId
+            session['showNs'] = showNs
+            session['maxScore'] = maxScore
+            return redirect(url_for('showProfile', uid=uid))
     return redirect(url_for('signin'))
 
 @app.route('/signup')
@@ -81,7 +85,7 @@ def addUser():
     salt = request.form['salt']
     uid = request.form['uid']
     pw = request.form['pw']
-    showNs = 1 if request.form['showNs'] == 'true' else 0
+    showNs = 1 if request.form['showNs'] == 'on' else 0
     UsMan.uploadUser(uid, pw, salt, nickName, name, studentId, showNs)
     UsMan.closeDb()
     return redirect(url_for('signin', uid=uid))
@@ -179,6 +183,8 @@ def uploadScore():
     except sqlite3.IntegrityError:
         if score > DbMan.getScoreByName(name):
             DbMan.updateScore(now, name, score, mCellCnt, frame, delayedTime)
+            UsMan = DbManager.UserManager()
+            UsMan.updateMaxScore()
             with open(f'static/image/{name}.jpg', 'wb') as f:
                 f.write(img)
     DbMan.closeDb()
