@@ -42,7 +42,7 @@ def addUser():
 def showProfile():
     uid = request.args.get('uid')
     UsMan = DbManager.UserManager()
-    tmp = UsMan.getInfo()
+    tmp = UsMan.getInfo(uid)
     UsMan.closeDb()
     if tmp == None: return render_template('profileErr.html')
     _, _, _, nickName, name, studentId, showNs, maxScore = tmp
