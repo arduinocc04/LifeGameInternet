@@ -36,7 +36,7 @@ def addUser():
     showNs = 1 if jsonData['showNs'] == 'true' else 0
     UsMan.uploadUser(uid, pw, salt, nickName, name, studentId, showNs)
     UsMan.closeDb()
-    return redirect('showProfile', uid=uid)
+    return redirect(url_for('showProfile', uid=uid))
 
 @app.route('/profile', methods=['GET'])
 def showProfile():
