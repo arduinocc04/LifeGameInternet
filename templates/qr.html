@@ -4,17 +4,7 @@
     <script type="text/javascript" src="{{url_for('static', filename='qrcode.js')}}"></script>
 </head>
 <body>
-    <div id="qrcode"></div>
+    <img src="{{imgSrc}}"></div>
     <a href="{{url2}}">{{url}}</a>
-    <script type="text/javascript">
-        var qrcode = new QRCode(document.getElementById("qrcode"), {
-            text: "{{url}}",
-            width: 128,
-            height: 128,
-            colorDark : "#000000",
-            colorLight : "#ffffff",
-            correctLevel : QRCode.CorrectLevel.H
-        });
-    </script>
 </body>
 </html>

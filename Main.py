@@ -7,10 +7,30 @@ import base64
 import hashlib
 import random
 import string
+import urllib.request
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'lisztlacampanella'
 app.secret_key = b'liszttarantella'
+
+def makeShortUrl(originalUrl:str) -> str:
+    client_id = "pQNqIrBIaA0SRAEyWpGs" # 개발자센터에서 발급받은 Client ID 값
+    client_secret = "myLShE0xHm" # 개발자센터에서 발급받은 Client Secret 값
+    encText = urllib.parse.quote(originalUrl)
+    data = "url=" + encText
+    url = "https://openapi.naver.com/v1/util/shorturl"
+    request = urllib.request.Request(url)
+    request.add_header("Content-Type", "application/x-www-form-urlencoded")
+    request.add_header("X-Naver-Client-Id",client_id)
+    request.add_header("X-Naver-Client-Secret",client_secret)
+    response = urllib.request.urlopen(request, data=data.encode("utf-8"))
+    rescode = response.getcode()
+
+    if(rescode == 200):
+        response_body = response.read()
+        return (response_body.decode('utf-8'))
+    else:
+        return("Error Code:" + rescode)
 
 @app.route('/')
 def main():
@@ -39,6 +59,7 @@ def login():
         if res != None:
             result = hashlib.sha256(pw.encode()).hexdigest()
             if result == res:
+                session['uid'] = uid
                 return redirect(url_for('showProfile', uid=uid))
     return redirect(url_for('signin'))
 
@@ -92,7 +113,9 @@ def genQrcode():
     GmMan = DbManager.GameManger()
     GmMan.uploadGame(tmp, '', now)
     GmMan.closeDb()
-    return render_template('qr.html', url = "www.arduinocc04.live:8000/game?gid=" + tmp, url2="/game?gid="+tmp)
+    url = "www.arduinocc04.live:8000/game?gid=" + tmp
+    imgSrc = f'http://api.qrserver.com/v1/create-qr-code/?data={url}&size=300x300'
+    return render_template('qr.html', url =url, url2="/game?gid="+tmp, imgSrc=imgSrc)
 
 @app.route('/scoreboard', methods=['GET'])
 def showScoreboard():
@@ -202,4 +225,4 @@ def showImageScore():
 if __name__ == "__main__":
     import setup
     #setup.setup()
-    app.run(host='0.0.0.0', port = 8000)
+    app.run(host='localhost', port = 8000)
