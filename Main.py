@@ -115,7 +115,7 @@ def showScoreboard():
         tmp[i] = (tmp[i], (prevPlace if prev == tmp[i][2] else i+1),)
         prev = tmp[i][0][2]
         prevPlace = tmp[i][1]
-    return render_template('leaderboard.html', scores=tmp, name=name, n = len(tmp))
+    return render_template('scoreboard.html', scores=tmp, name=name, n = len(tmp), gid=gid)
 
 
 @app.route('/game', methods=['GET'])
@@ -189,6 +189,18 @@ def showImage():
     DbMan = DbManager.DbManager()
     _, _, _, mCellCnt, frame, delayedTime = DbMan.getRawInfo(name)
     return render_template('image.html', targetName = name, originalName=originalName, time=time, score=score, rank=rank, imgName=f'image/{name}.jpg', mCellCnt=mCellCnt, frame=frame, delayedTime=delayedTime)
+
+@app.route('/imageScore', methods = ['GET'])
+def showImage():
+    name = request.args.get('name')
+    gid = request.args.get('gid')
+    originalName = request.args.get('originalName')
+    time = request.args.get('time')
+    score = float(request.args.get('score'))
+    rank = int(request.args.get('rank'))
+    DbMan = DbManager.DbManager()
+    _, _, _, mCellCnt, frame, delayedTime = DbMan.getRawInfo(name)
+    return render_template('image_score.html', targetName = name, originalName=originalName, time=time, score=score, rank=rank, imgName=f'image/{name}.jpg', mCellCnt=mCellCnt, frame=frame, delayedTime=delayedTime, gid=gid)
 
 if __name__ == "__main__":
     import setup

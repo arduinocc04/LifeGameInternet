@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset = "utf-8">
+    <title>{{ targetName }}'s Initial condition</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <a href={{ url_for('game') }}>게임으로 돌아가기</a>
+    <a href={{ url_for('showScoreboard', name=originalName, gid=gid) }}>리더보드로 돌아가기</a>
+    <img id="target" src="{{url_for('static', filename=imgName)}}">
+    <p id="name">이름: {{targetName}}</p>
+    <p id="rank">순위: {{rank}}</p>
+    <p id="time">시간: {{time}}</p>
+    <p id="score">점수: {{score}}</p>
+    <p id="mCellCnt">최대 세포 개수: {{mCellCnt}}</p>
+    <p id="frame">총 프레임: {{frame}}</p>
+    <p id="delayedTime">최대 개수 놓기까지 걸린 시간: {{delayedTime}}ms</p>
+</body>
+</html>
