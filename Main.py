@@ -93,7 +93,7 @@ def genQrcode():
 
 @app.route('scoreboard', methods=['POST'])
 def showScoreboard():
-    
+    pass
 
 @app.route('/game', methods=['GET'])
 def game():
