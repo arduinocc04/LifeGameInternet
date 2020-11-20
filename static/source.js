@@ -87,6 +87,7 @@ function end() {
 	stop();
 	var mCellCnt = parseInt(document.getElementById("mCellCnt").value)
 	var score = (5000 * mCellCnt * mCellCnt * Math.sqrt(frame))/Math.pow(delayedTime, Math.SQRT2);
+	score = score.toFixed(2);
 	console.log(score);
 	var data = new Object();
 	data.name = name;
@@ -102,7 +103,7 @@ function end() {
 	request.setRequestHeader('Content-Type', 'application/json');
 	request.send(jsonData)
 	request.onload = function() {
-		if(request.status == 200 || request.status == 201) window.location.href = "/scoreboard?name=" + name;
+		if(request.status == 200 || request.status == 201) window.location.href = "/leaderboard?name=" + name;
 	}
 }
 

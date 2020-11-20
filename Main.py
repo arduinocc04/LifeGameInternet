@@ -1,42 +1,71 @@
 from flask import Flask, render_template, request, redirect, url_for, session
-from flask import json
 from flask_socketio import SocketIO, emit
 import DbManager
 import ntplib
 import sqlite3
 from time import ctime
 import base64
+import hashlib
+import random
+import string
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'lisztlacampanella'
+app.secret_key = b'liszttarantella'
 sio = SocketIO(app)
 
 @app.route('/')
 def main():
-    if not session.get('logged_in'): return redirect('signin')
+    #if not 'uid' in session: return redirect('signin')
     return redirect('game')
+
+@app.route('/signout')
+def signout():
+    session.pop('uid')
+    return redirect(url_for('signin'))
 
 @app.route('/signin')
 def signin():
     return render_template('signin.html')
 
+@app.route('/signinUser', methods=['POST'])
+def login():
+    UsMan = DbManager.UserManager()
+    jsonData = request.get_json()
+    uid = jsonData['uid']
+    pw = jsonData['pw']
+    salt = UsMan.getSalt(uid)
+    res = UsMan.getPw(uid)
+    if salt != None:
+        pw = pw + salt
+        if res != None:
+            result = hashlib.sha256(pw.encode()).hexdigest()
+            if result == res:
+                return redirect(url_for('showProfile', uid=uid))
+    return redirect(url_for('signin'))
+
 @app.route('/signup')
 def signup():
     return render_template('signup.html')
 
+@app.route('/err')
+def error():
+    return render_template('Error.html')
+
 @app.route('/addUser', methods=['POST'])
 def addUser():
+    print(request.form)
     UsMan = DbManager.UserManager()
-    jsonData = request.get_json()
-    name = jsonData['name']
-    nickName = jsonData['nickName']
-    studentId = int(jsonData['studentId'])
-    salt = jsonData['salt']
-    uid = jsonData['uid']
-    pw = jsonData['pw']
-    showNs = 1 if jsonData['showNs'] == 'true' else 0
+    name = request.form['name']
+    nickName = request.form['nickName']
+    studentId = int(request.form['studentId'])
+    salt = request.form['salt']
+    uid = request.form['uid']
+    pw = request.form['pw']
+    showNs = 1 if request.form['showNs'] == 'true' else 0
     UsMan.uploadUser(uid, pw, salt, nickName, name, studentId, showNs)
     UsMan.closeDb()
-    return redirect(url_for('showProfile', uid=uid))
+    return redirect(url_for('signin', uid=uid))
 
 @app.route('/profile', methods=['GET'])
 def showProfile():
@@ -55,10 +84,22 @@ def showProfile():
            # studentId="비밀"
     return render_template('profile.html', uid=uid, studentId=studentId, name=name, nickName=nickName, maxScore=maxScore, add=add)
 
+@app.route('/gqrcode')
+def genQrcode():
+    tmp = '' #8자리 랜덤 문자열
+    for _ in range(8):
+        tmp += random.choice(string.ascii_letters)
+    return render_template('qr.html', url = 'http://www.arduinocc04.live:8080' + url_for('game', gid=tmp))
 
-@app.route('/game')
+@app.route('scoreboard', methods=['POST'])
+def showScoreboard():
+    
+
+@app.route('/game', methods=['GET'])
 def game():
-    return render_template('life.html')
+    gid = request.args.get('gid')
+    return render_template('life.html', gid=gid)
+
 
 @app.route('/wating')
 def wating():
@@ -117,4 +158,6 @@ def showImage():
     return render_template('image.html', targetName = name, originalName=originalName, time=time, score=score, rank=rank, imgName=f'image/{name}.jpg', mCellCnt=mCellCnt, frame=frame, delayedTime=delayedTime)
 
 if __name__ == "__main__":
-    sio.run(app, host='0.0.0.0', port = 8000)
+    import setup
+    #setup.setup()
+    sio.run(app, host='localhost', port = 8000)

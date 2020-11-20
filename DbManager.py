@@ -1,5 +1,4 @@
 import sqlite3
-from sqlite3.dbapi2 import connect
 from time import ctime
 import typing
 class DbManager:
@@ -150,6 +149,44 @@ class UserManager:
         self.conn.commit()
         self.c.close()
         self.conn.close()
+
+class GameManger:
+    def __init__(self) -> None:
+        self.conn = sqlite3.connect('Games.db')
+        self.c = self.conn.cursor()
+
+    def makeDb(self)-> None:
+        query = """
+        CREATE TABLE "Games" (
+        	"Gid"	TEXT,
+        	"Players"	TEXT,
+        	"MadeTime"	TEXT,
+        	PRIMARY KEY("Gid")
+        );
+        """
+        self.c.execute(query)
+        self.conn.commit()
+
+    def deleteAll(self) -> None:
+        query = "DROP TABLE Games"
+        self.c.execute(query)
+        self.conn.commit()
+
+    def deleteGame(self, gid:str) -> None:
+        query = f'DELETE FROM Games WHERE Gid = "{gid}"'
+        self.c.execute(query)
+        self.conn.commit()
+
+    def uploadGame(self, gid:str, players:str, time:str) -> None:
+        query = f'INSERT INTO Games (Gid, Players, MadeTime) VALUES ("{gid}", "{players}", "{time}"'
+        self.c.execute(query)
+        self.conn.commit()
+    
+    def getInfo(self, gid:str) -> typing.Tuple:
+        query = f'SELECT * FROM Games WHERE Gid = "{gid}"'
+        self.c.execute(query)
+        self.conn.commit()
+        return self.c.fetchone()
     
 if __name__ == '__main__':
     import time

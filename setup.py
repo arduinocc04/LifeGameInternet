@@ -1,7 +1,6 @@
 import os
 import DbManager
-
-if __name__ == '__main__':
+def setup():
     if(not os.path.isdir('./static/image')): os.mkdir('./static/image')
     cmd = int(input("Del Score Db? yes->1 no->0"))
     if cmd == 1:
@@ -15,3 +14,6 @@ if __name__ == '__main__':
         DbMan = DbManager.UserManager()
         DbMan.makeDb()
         DbMan.closeDb()
+
+if __name__ == '__main__':
+    setup()
