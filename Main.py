@@ -95,7 +95,7 @@ def genQrcode():
     GmMan = DbManager.GameManger()
     GmMan.uploadGame(tmp, '', now)
     GmMan.closeDb()
-    return render_template('qr.html', url = "www.arduinocc04.live:8000?gid=" + tmp)
+    return render_template('qr.html', url = "www.arduinocc04.live:8000/game?gid=" + tmp, url2="/game?gid="+tmp)
 
 @app.route('/scoreboard', methods=['GET'])
 def showScoreboard():
