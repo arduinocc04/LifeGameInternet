@@ -1,6 +1,4 @@
 from flask import Flask, render_template, request, redirect, url_for, session
-from flask import json
-from flask_socketio import SocketIO, emit
 import DbManager
 import ntplib
 import sqlite3
@@ -13,11 +11,10 @@ import string
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'lisztlacampanella'
 app.secret_key = b'liszttarantella'
-sio = SocketIO(app)
 
 @app.route('/')
 def main():
-    #if not 'uid' in session: return redirect('signin')
+    if not 'uid' in session: return redirect('signin')
     return redirect('game')
 
 @app.route('/signout')
@@ -205,4 +202,4 @@ def showImageScore():
 if __name__ == "__main__":
     import setup
     #setup.setup()
-    sio.run(app, host='0.0.0.0', port = 8000)
+    app.run(host='0.0.0.0', port = 8000)
