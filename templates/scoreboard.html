@@ -35,6 +35,7 @@
 	<input id="gid" type="hidden">
 	<a href={{ url_for('game', gid=gid) }}>게임으로 돌아가기</a>
 	<button onclick="findMine(event)">내 점수 보기</button>
+	<a href="{{ url_for('showLeaderBoard') }}">리더보드 보기</a>
 	<p>당신 ID: {{yourId}}</p>
 	<table class="BgAnd2Way">
 		<thead>
