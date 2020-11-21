@@ -1,3 +1,4 @@
+//original code: https://github.com/chkrr00k/LifeGame
 const le = 40, wi =20, pad = 20;
 const sizes = Array.from({length: le}, (v, k) => (k * wi) + pad);
 var mat = Array.from({length: le}, (v, k) => Array.from({length: le}, (v, k) => false));
@@ -30,8 +31,8 @@ window.onload = function() {
 		fillRectangle(ctx, x, y);
 		
 	}
-	name = prompt("닉네임을 입력하세요!");
-	if(name == null || name == "" || name == "null") name = Math.random().toString(36).substr(2,9)
+	//name = prompt("닉네임을 입력하세요!");
+	//if(name == null || name == "" || name == "null") name = Math.random().toString(36).substr(2,9)
 	var today = new Date();
 	startTime = today.getTime();
 	/*
@@ -95,7 +96,7 @@ function end() {
 	score = score.toFixed(2);
 	console.log(score);
 	var data = new Object();
-	data.name = name;
+	//data.name = name;
 	data.mCellCnt = mCellCnt;
 	data.frame = frame;
 	data.delayedTime = delayedTime;

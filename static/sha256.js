@@ -1,4 +1,12 @@
-function SHA256(s) { //SHA 256, http://www.webtoolkit.info/ , Original code by Angel Marin, Paul Johnston.
+/**
+*
+*  Secure Hash Algorithm (SHA256)
+*  http://www.webtoolkit.info/
+*
+*  Original code by Angel Marin, Paul Johnston.
+*
+**/
+function SHA256(s) {
     var chrsz = 8;
     var hexcase = 0;
 

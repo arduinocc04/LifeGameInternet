@@ -34,8 +34,8 @@ def makeShortUrl(originalUrl:str) -> str:
 
 @app.route('/')
 def main():
-    if not 'uid' in session: return redirect('signin')
-    return redirect('game')
+    if not 'uid' in session: return redirect(url_for('signin'))
+    return redirect(url_for('genQrcode'))
 
 @app.route('/signout')
 def signout():
@@ -54,16 +54,11 @@ def login():
     tmp = UsMan.getInfo(uid)
     UsMan.closeDb()
     if tmp != None:
-        _, res, salt, nickName, name, studentId, showNs, maxScore = tmp
+        _, res, salt, name, studentId, showNs = tmp
         pw = pw + salt
         result = hashlib.sha256(pw.encode()).hexdigest()
         if result == res:
             session['uid'] = uid
-            session['nickName'] = nickName
-            session['name'] = name
-            session['studentId'] = studentId
-            session['showNs'] = showNs
-            session['maxScore'] = maxScore
             return redirect(url_for('showProfile', uid=uid))
     return redirect(url_for('signin'))
 
@@ -79,33 +74,38 @@ def error():
 def addUser():
     print(request.form)
     UsMan = DbManager.UserManager()
+    DbMan = DbManager.DbManager()
     name = request.form['name']
-    nickName = request.form['nickName']
     studentId = int(request.form['studentId'])
     salt = request.form['salt']
     uid = request.form['uid']
     pw = request.form['pw']
-    showNs = 1 if request.form['showNs'] == 'on' else 0
-    UsMan.uploadUser(uid, pw, salt, nickName, name, studentId, showNs)
+    #showNs = 1 if request.form['showNs'] == 'on' else 0
+    showNs = 1
+    try:
+        UsMan.uploadUser(uid, pw, salt, name, studentId, showNs)
+    except sqlite3.IntegrityError:
+        return redirect(url_for('idErr'))
+    DbMan.uploadScore(0, uid, 0, 0, 0, 0)
+    DbMan.closeDb()
     UsMan.closeDb()
-    return redirect(url_for('signin', uid=uid))
+    return redirect(url_for('signin'))
+
+@app.route('/idErr')
+def idErr():
+    return render_template('idErr.html')
 
 @app.route('/profile', methods=['GET'])
 def showProfile():
     uid = request.args.get('uid')
     UsMan = DbManager.UserManager()
+    DbMan = DbManager.DbManager()
     tmp = UsMan.getInfo(uid)
     UsMan.closeDb()
     if tmp == None: return render_template('profileErr.html')
-    _, _, _, nickName, name, studentId, showNs, maxScore = tmp
-    add = ""
-    #if not showNs:
-        #if session['id'] == uid:
-       #     add = "(not visible)"
-        #else:
-            #name="비밀"
-           # studentId="비밀"
-    return render_template('profile.html', uid=uid, studentId=studentId, name=name, nickName=nickName, maxScore=maxScore, add=add)
+    _, _, _, name, studentId, showNs = tmp
+    maxScore = DbMan.getMScoreByName(uid)
+    return render_template('profile.html', uid=uid, studentId=studentId, name=name, maxScore=maxScore, yourId=session['uid'])
 
 @app.route('/gqrcode')
 def genQrcode():
@@ -119,19 +119,20 @@ def genQrcode():
     GmMan.closeDb()
     url = "www.arduinocc04.live:8000/game?gid=" + tmp
     imgSrc = f'http://api.qrserver.com/v1/create-qr-code/?data={url}&size=300x300'
-    return render_template('qr.html', url =url, url2="/game?gid="+tmp, imgSrc=imgSrc)
+    return render_template('qr.html', url =url, url2="/game?gid="+tmp, imgSrc=imgSrc, yourId=session['uid'])
 
 @app.route('/scoreboard', methods=['GET'])
 def showScoreboard():
     GmMan = DbManager.GameManger()
     DbMan = DbManager.DbManager()
     gid = request.args.get('gid')
+    name = session['uid']
     name = request.args.get('name')
     tmp = GmMan.getInfo(gid)
     if tmp == None: return redirect(url_for('error'))
     _, players, t = tmp
     players = players.split(',')
-    tmp = [DbMan.getTNS(p) for p in players]
+    tmp = [DbMan.getLTNS(p) for p in players]
     tmp.sort(key = lambda x:-x[2])
     prev = -1
     prevPlace = -1
@@ -139,34 +140,34 @@ def showScoreboard():
         tmp[i] = (tmp[i], (prevPlace if prev == tmp[i][2] else i+1),)
         prev = tmp[i][0][2]
         prevPlace = tmp[i][1]
-    return render_template('scoreboard.html', scores=tmp, name=name, n = len(tmp), gid=gid)
+    return render_template('scoreboard.html', scores=tmp, name=name, n = len(tmp), gid=gid, yourId=session['uid'])
 
 
 @app.route('/game', methods=['GET'])
 def game():
     gid = request.args.get('gid')
-    return render_template('life.html', gid=gid)
+    return render_template('life.html', gid=gid, yourId=session['uid'])
 
 @app.route('/appendUser', methods=['GET'])
 def appendUser():
     print('Hi!')
     gid = request.args.get('gid')
-    uid = request.args.get('uid')
+    uid = session['uid']
+    # uid = request.args.get('uid')
     print(f'gid:{gid}uid:{uid}')
     GmMan = DbManager.GameManger()
-    GmMan.appendPlayer(gid, uid)
+    _, ps, _ = GmMan.getInfo(gid)
+    if not uid in ps.split(','):
+        GmMan.appendPlayer(gid, uid)
     GmMan.closeDb()
     return redirect(url_for('showScoreboard', gid=gid, name=uid))
-
-@app.route('/wating')
-def wating():
-    return render_template('wating.html')
 
 @app.route('/score', methods=['POST'])
 def uploadScore():
     DbMan = DbManager.DbManager()
     jsonData = request.get_json()
-    name = jsonData['name']
+    name = session['uid']
+    #name = jsonData['name']
     mCellCnt = int(jsonData['mCellCnt'])
     frame = int(jsonData['frame'])
     delayedTime = float(jsonData['delayedTime'])
@@ -175,18 +176,13 @@ def uploadScore():
 
     cli = ntplib.NTPClient()
     now = ctime(cli.request("kr.pool.ntp.org").tx_time + 32400)
-
-    try:
-        DbMan.uploadScore(now, name, score, mCellCnt, frame, delayedTime)
+    with open(f'static/image/{name}_last.jpg', 'wb') as f:
+        f.write(img)
+    DbMan.updateLScore(now, name, score, mCellCnt, frame, delayedTime)
+    if score > DbMan.getMScoreByName(name):
+        DbMan.updateMScore(now, name, score, mCellCnt, frame, delayedTime)
         with open(f'static/image/{name}.jpg', 'wb') as f:
             f.write(img)
-    except sqlite3.IntegrityError:
-        if score > DbMan.getScoreByName(name):
-            DbMan.updateScore(now, name, score, mCellCnt, frame, delayedTime)
-            UsMan = DbManager.UserManager()
-            UsMan.updateMaxScore()
-            with open(f'static/image/{name}.jpg', 'wb') as f:
-                f.write(img)
     DbMan.closeDb()
     return redirect(url_for('showLeaderBoard', name=name))
 
@@ -194,7 +190,7 @@ def uploadScore():
 def showLeaderBoard():
     name = request.args.get('name')
     DbMan = DbManager.DbManager()
-    tmp = DbMan.getTNSAll()
+    tmp = DbMan.getMTNSAll()
     DbMan.closeDb()
     tmp.sort(key = lambda x:-x[2])
     prev = -1
@@ -203,7 +199,7 @@ def showLeaderBoard():
         tmp[i] = (tmp[i], (prevPlace if prev == tmp[i][2] else i+1),)
         prev = tmp[i][0][2]
         prevPlace = tmp[i][1]
-    return render_template('leaderboard.html', scores=tmp, name=name, n = len(tmp))
+    return render_template('leaderboard.html', scores=tmp, name=name, n = len(tmp), yourId=session['uid'])
 
 @app.route('/image', methods = ['GET'])
 def showImage():
@@ -213,8 +209,8 @@ def showImage():
     score = float(request.args.get('score'))
     rank = int(request.args.get('rank'))
     DbMan = DbManager.DbManager()
-    _, _, _, mCellCnt, frame, delayedTime = DbMan.getRawInfo(name)
-    return render_template('image.html', targetName = name, originalName=originalName, time=time, score=score, rank=rank, imgName=f'image/{name}.jpg', mCellCnt=mCellCnt, frame=frame, delayedTime=delayedTime)
+    _, _, _, mCellCnt, frame, delayedTime = DbMan.getMRawInfo(name)
+    return render_template('image.html', targetName = name, originalName=originalName, time=time, score=score, rank=rank, imgName=f'image/{name}.jpg', mCellCnt=mCellCnt, frame=frame, delayedTime=delayedTime, yourId=session['uid'])
 
 @app.route('/imageScore', methods = ['GET'])
 def showImageScore():
@@ -225,8 +221,8 @@ def showImageScore():
     score = float(request.args.get('score'))
     rank = int(request.args.get('rank'))
     DbMan = DbManager.DbManager()
-    _, _, _, mCellCnt, frame, delayedTime = DbMan.getRawInfo(name)
-    return render_template('image_score.html', targetName = name, originalName=originalName, time=time, score=score, rank=rank, imgName=f'image/{name}.jpg', mCellCnt=mCellCnt, frame=frame, delayedTime=delayedTime, gid=gid)
+    _, _, _, mCellCnt, frame, delayedTime = DbMan.getLRawInfo(name)
+    return render_template('image_score.html', targetName = name, originalName=originalName, time=time, score=score, rank=rank, imgName=f'image/{name}_last.jpg', mCellCnt=mCellCnt, frame=frame, delayedTime=delayedTime, gid=gid, yourId=session['uid'])
 
 if __name__ == "__main__":
     import setup

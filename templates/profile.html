@@ -3,10 +3,18 @@
 <head>
 </head>
 <body>
-    <p id="uid">{{uid}}</p>
-    <p id="studentId">{{studentId}}{{add}}</p>
-    <p id="name">{{name}}{{add}}</p>
-    <p id="nickName">{{nickName}}</p>
-    <p id="maxScore">{{maxScore}}</p>
+    <p>당신 ID: {{yourId}}</p>
+    <fieldset>
+        <legend>개인 정보</legend>
+        ID: <p id="uid">{{uid}}</p>
+        학번: <p id="studentId">{{studentId}}</p>
+        이름: <p id="name">{{name}}</p>
+    </fieldset>
+    <fieldset>
+        <legend>이것 저것</legend>
+        최대 점수: <p id="maxScore">{{maxScore}}</p>
+        <a href="/gqrcode">QR코드 생성</a><br>
+        <a href="{{url_for('showLeaderBoard', name=uid)}}">리더보드에서 {{uid}}보기</a>
+    </fieldset>
 </body>
 </html>

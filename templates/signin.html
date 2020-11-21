@@ -1,32 +1,34 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <script type="text/javascript">
-    function signin() {
-      id = document.getElementById('uid').value;
-      pw = document.getElementById('pw').value;
-      var form = document.forms['login'];
-      if(id == "") {
-        alert("아이디를 입력하십시오");
-        return false;
-      }
-      if(pw == "") {
-        alert("비밀번호를 입력하십시오");
-        return false;
-      }
-      form.submit();
-    }
-  </script>
+    <script type="text/javascript">
+        function signin() {
+            id = document.getElementById('uid').value;
+            pw = document.getElementById('pw').value;
+            var form = document.forms['login'];
+            if (id == "") {
+                alert("아이디를 입력하십시오");
+                return false;
+            }
+            if (pw == "") {
+                alert("비밀번호를 입력하십시오");
+                return false;
+            }
+            form.submit();
+        }
+    </script>
 </head>
+
 <body>
-  <a href="{{url_for('signup')}}">회원가입 하기</a>
-  <form action="/signinUser" method="POST" name="login">
-    <fieldset>
-      <legend>계정 정보 입력</legend>
-      ID: <input id="uid" type="text" name="uid"><br>
-      PW: <input id="pw" type="password" name="pw">
-    </fieldset>
-    <button id="signin" onclick="signin()">로그인 하기</button>
-  </form>
+    <a href="{{url_for('signup')}}">회원가입 하기</a>
+    <form action="/signinUser" method="POST" name="login">
+        <fieldset>
+            <legend>계정 정보 입력</legend>
+            ID: <input id="uid" type="text" name="uid"><br>
+            PW: <input id="pw" type="password" name="pw">
+        </fieldset>
+        <button id="signin" onclick="signin();">로그인 하기</button>
+    </form>
 </body>
+
 </html>

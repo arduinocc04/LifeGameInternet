@@ -9,12 +9,17 @@ class DbManager:
     def makeDb(self) -> None:
         query = """
         CREATE TABLE "Scores" (
-	        "Time"	TEXT,
 	        "Name"	TEXT,
-	        "Score"	REAL,
-	        "MaxCellCnt"	INTEGER,
-	        "Frame"	INTEGER,
-	        "DelayedTime"	REAL,
+	        "MTime"	TEXT,
+            "LTime" TEXT,
+	        "MScore"	REAL,
+	        "MMaxCellCnt"	INTEGER,
+	        "MFrame"	INTEGER,
+	        "MDelayedTime"	REAL,
+	        "LScore"	REAL,
+	        "LMaxCellCnt"	INTEGER,
+	        "LFrame"	INTEGER,
+	        "LDelayedTime"	REAL,
 	        PRIMARY KEY("Name")
         );"""
         self.c.execute(query)
@@ -26,34 +31,69 @@ class DbManager:
         self.conn.commit()
 
     def uploadScore(self, time:str, name:str, score:float, mCellCnt:int, frame:int, delayedTime:float) -> None:
-        query = f'INSERT INTO Scores (Time, Name, Score, MaxCellCnt, Frame, DelayedTime) VALUES ("{time}", "{name}", {score}, {mCellCnt}, {frame}, {delayedTime})'
+        query = f'INSERT INTO Scores (Name, MTime, LTime, MScore, MMaxCellCnt, MFrame, MDelayedTime, LScore, LMaxCellCnt, LFrame, LDelayedTime) VALUES ("{name}", "{time}", "{time}",{score}, {mCellCnt}, {frame}, {delayedTime}, {score}, {mCellCnt}, {frame}, {delayedTime})'
         self.c.execute(query)
         self.conn.commit()
 
-    def updateScore(self, time:str, name:str, score:float, mCellCnt:int, frame:int, delayedTime:float) -> None:
-        query = f'UPDATE Scores SET Score = {score}, Time = "{time}", MaxCellCnt = {mCellCnt}, Frame = {frame}, DelayedTime = {delayedTime} WHERE Name = "{name}"'
+    def updateMScore(self, time:str, name:str, score:float, mCellCnt:int, frame:int, delayedTime:float) -> None:
+        query = f'UPDATE Scores SET MScore = {score}, MTime = "{time}", MMaxCellCnt = {mCellCnt}, MFrame = {frame}, MDelayedTime = {delayedTime} WHERE Name = "{name}"'
         self.c.execute(query)
         self.conn.commit()
 
-    def getTNSAll(self) -> typing.List:
-        query = 'SELECT Time, Name, Score FROM Scores'
+    def updateLScore(self, time:str, name:str, score:float, mCellCnt:int, frame:int, delayedTime:float) -> None:
+        query = f'UPDATE Scores SET LScore = {score}, LTime = "{time}", LMaxCellCnt = {mCellCnt}, LFrame = {frame}, LDelayedTime = {delayedTime} WHERE Name = "{name}"'
+        self.c.execute(query)
+        self.conn.commit()
+
+    def getMTNSAll(self) -> typing.List:
+        query = 'SELECT MTime, Name, MScore FROM Scores'
         self.c.execute(query)
         self.conn.commit()
         return self.c.fetchall()
 
-    def getScoreByName(self, name:str) -> float:
-        query = f'SELECT Score FROM Scores WHERE Name = "{name}"'
+    def getMScoreByName(self, name:str) -> float:
+        query = f'SELECT MScore FROM Scores WHERE Name = "{name}"'
         self.c.execute(query)
         self.conn.commit()
         return self.c.fetchone()[0]
     
-    def getTNS(self, name:str) -> typing.Tuple:
-        query = f'SELECT Time, Name, Score FROM Scores WHERE Name = "{name}"'
+    def getMTNS(self, name:str) -> typing.Tuple:
+        query = f'SELECT MTime, Name, MScore FROM Scores WHERE Name = "{name}"'
         self.c.execute(query)
         self.conn.commit()
         return self.c.fetchone()
 
-    def getRawInfo(self, name:str) -> typing.Tuple:
+    def getLTNSAll(self) -> typing.List:
+        query = 'SELECT LTime, Name, LScore FROM Scores'
+        self.c.execute(query)
+        self.conn.commit()
+        return self.c.fetchall()
+
+    def getLScoreByName(self, name:str) -> float:
+        query = f'SELECT LScore FROL Scores WHERE Name = "{name}"'
+        self.c.execute(query)
+        self.conn.commit()
+        return self.c.fetchone()[0]
+    
+    def getLTNS(self, name:str) -> typing.Tuple:
+        query = f'SELECT LTime, Name, LScore FROM Scores WHERE Name = "{name}"'
+        self.c.execute(query)
+        self.conn.commit()
+        return self.c.fetchone()
+
+    def getMRawInfo(self, name:str) -> typing.Tuple:
+        query = f'SELECT Name, MTime, Mscore, MMaxCellCnt, MFrame, MDelayedTime FROM Scores WHERE Name = "{name}"'
+        self.c.execute(query)
+        self.conn.commit()
+        return self.c.fetchone()
+
+    def getLRawInfo(self, name:str) -> typing.Tuple:
+        query = f'SELECT Name, LTime, Lscore, LMaxCellCnt, LFrame, LDelayedTime FROM Scores WHERE Name = "{name}"'
+        self.c.execute(query)
+        self.conn.commit()
+        return self.c.fetchone()
+
+    def getInfo(self, name:str) -> typing.Tuple:
         query = f'SELECT * FROM Scores WHERE Name = "{name}"'
         self.c.execute(query)
         self.conn.commit()
@@ -75,11 +115,9 @@ class UserManager:
         	"ID"	TEXT,
         	"PW"	TEXT NOT NULL,
         	"Salt"	TEXT NOT NULL,
-        	"NickName"	TEXT NOT NULL,
         	"Name"	TEXT NOT NULL,
         	"StudentId"	TEXT NOT NULL UNIQUE,
         	"ShowNS"	INTEGER NOT NULL,
-        	"MaxScore"	REAL DEFAULT 0,
         	PRIMARY KEY("ID")
         );
         """
@@ -96,8 +134,8 @@ class UserManager:
         self.c.execute(query)
         self.conn.commit()
 
-    def uploadUser(self, uid:str, pw:str, salt:str, nickName:str, name:str, studentId:int, showNS:int, MaxScore:float=0) -> None:
-        query = f'INSERT INTO Users (ID, PW, Salt, NickName, Name, StudentId, ShowNS, MaxScore) VALUES ("{uid}", "{pw}", "{salt}", "{nickName}", "{name}", {studentId}, {showNS}, {MaxScore})'
+    def uploadUser(self, uid:str, pw:str, salt:str, name:str, studentId:int, showNS:int) -> None:
+        query = f'INSERT INTO Users (ID, PW, Salt, Name, StudentId, ShowNS) VALUES ("{uid}", "{pw}", "{salt}", "{name}", {studentId}, {showNS})'
         self.c.execute(query)
         self.conn.commit()
 
@@ -106,18 +144,8 @@ class UserManager:
         self.c.execute(query)
         self.conn.commit(query)
 
-    def updateNickName(self, uid:str, nickname:str) -> None:
-        query = f'UPDATE Users SET NickName = "{nickname}" WHERE ID = "{uid}"'
-        self.c.execute(query)
-        self.conn.commit()
-
     def updateStudentId(self, uid:str, studentId:int) -> None:
         query = f'UPDATE Users SET StudentId = {studentId} WHERE ID = "{uid}"'
-        self.c.execute(query)
-        self.conn.commit()
-
-    def updateMaxScore(self, uid:str, score:float) -> None:
-        query = f'UPDATE Users SET MaxScore = {score} WHERE ID = "{uid}"'
         self.c.execute(query)
         self.conn.commit()
 
@@ -139,12 +167,6 @@ class UserManager:
         self.conn.commit()
         return self.c.fetchone()
 
-    def getNNameMScoreAll(self) -> typing.List:
-        query = 'SELECT NickName, MaxScore FROM Users'
-        self.c.execute(query)
-        self.conn.commit()
-        return self.c.fetchall()
-    
     def closeDb(self) -> None:
         self.conn.commit()
         self.c.close()

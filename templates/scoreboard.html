@@ -33,9 +33,9 @@
 </head>
 <body>
 	<input id="gid" type="hidden">
-	<a href={{ url_for('game') }}>게임으로 돌아가기</a>
+	<a href={{ url_for('game', gid=gid) }}>게임으로 돌아가기</a>
 	<button onclick="findMine(event)">내 점수 보기</button>
-	<p>자신의 점수를 클릭하면 맨 위로 돌아갈 수 있습니다.</p>
+	<p>당신 ID: {{yourId}}</p>
 	<table class="BgAnd2Way">
 		<thead>
 			<th>순위</th>
@@ -46,8 +46,8 @@
 		<tbody>
 			{% for i in range(n) %}
 			{% if scores[i][0][1] == name %}
-			<tr id="mine" class="mine" onclick="goUp(event)">
-			{% elif scores[i][0][1] == "10222 조다니엘" %}
+			<tr id="mine" class="mine" onclick='seeImg("{{scores[i][0][1]}}", "{{scores[i][0][0]}}", "{{scores[i][0][2]}}","{{ scores[i][1] }}")'>
+			{% elif scores[i][0][1] == "arduinocc04" %}
 			<tr class="developer" onclick='seeImg("{{scores[i][0][1]}}", "{{scores[i][0][0]}}", "{{scores[i][0][2]}}","{{ scores[i][1] }}")'>
 			{% elif i%2== 0 %}
 			<tr class="even" onclick='seeImg("{{scores[i][0][1]}}", "{{scores[i][0][0]}}", "{{scores[i][0][2]}}","{{ scores[i][1] }}")'>
@@ -56,7 +56,7 @@
 			{% endif %}
 				<th>{{ scores[i][1] }}</th>
 				<td>{{scores[i][0][0]}}</td>
-				<td>{{scores[i][0][1]}}</td>
+				<td><a href="/profile?uid={{scores[i][0][1]}}">{{scores[i][0][1]}}</a></td>
 				<td>{{scores[i][0][2]}}</td>
 			</tr>
 			{% endfor %}

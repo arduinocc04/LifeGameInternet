@@ -3,16 +3,12 @@
 <head>
     <script type="text/javascript" src="{{url_for('static', filename='sha256.js')}}"></script>
     <script type="text/javascript">
-        window.onload = function() {
-            tmp = document.getElementById('salt')
-            tmp.value = Math.random().toString(36).substr(2,8) // 8자리 글자.
-        }
         function isPWREPWSame() {
             pw = document.getElementById('pw').value;
             repw = document.getElementById('rePw').value;
             return pw == repw;
         }
-        function signup() {
+        function signUp() {
             var form = document.forms['signup'];
             if (document.getElementById('uid').value == "") {
                 alert("아이디를 입력하십시오");
@@ -34,16 +30,23 @@
                 alert("이름 입력 하십시오");
                 return false;
             }
-            if (document.getElementById('nickName').value == "") {
-                alert("닉네임 입력 하십시오");
-                return false;
-            }
             if(!isPWREPWSame()) {
                 alert("비밀번호와 비밀번호 재입력 결과가 다릅니다!");
                 return false;
             }
-            document.getElementById('pw').value = SHA256(document.getElementById('pw').value + document.getElementById('salt').value)
+            var a = document.getElementById('pw');
+            var tmp = document.getElementById('rPw');
+            var salt = document.getElementById('salt');
+            var b = SHA256(a.value + salt.value);
+            tmp.value = b;
+            console.log(tmp.value);
+            console.log(a.value);
+            console.log(salt.value);
             form.submit();
+        }
+        window.onload = function() {
+            tmp = document.getElementById('salt')
+            tmp.value = Math.random().toString(36).substr(2,8) // 8자리 글자.
         }
     </script>
 </head>
@@ -51,20 +54,20 @@
 <body>
     <form name="signup" action="/addUser" method="POST">
         <input id="salt" name="salt" type="hidden">
+        <input id="rPw" name="pw" type="hidden">
         <fieldset>
             <legend>계정 정보 입력</legend>
             ID: <input id="uid" name="uid" type="text" maxlength="15"><br>
-            PW: <input id="pw" name="pw" type="password" maxlength="20"><br>
+            PW: <input id="pw" type="password" maxlength="20"><br>
             REPW: <input id="rePw" type="password" maxlength="20">
         </fieldset>
         <fieldset>
             <legend>개인 정보</legend>
             학번: <input id="studentId" name="studentId" type="number" maxlength="5"><br>
             이름: <input id="name" name="name" type="text" maxlength="6"><br>
-            닉네임: <input id="nickName" name="nickName" type="text" maxlength="10"><br>
-            학번, 이름 공개할건가요? <input id="showNs" name="showNs" type="checkbox" checked="true">
+            <!--학번, 이름 공개할건가요? <input id="showNs" name="showNs" type="checkbox" checked="true">-->
         </fieldset>
-        <button onclick="signup();">회원가입 하기</button>
+        <button onclick="signUp();">회원가입 하기</button>
     </form>
 </body>
 
