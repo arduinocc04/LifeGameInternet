@@ -36,15 +36,15 @@
             }
             const pattern = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣|a-z|A-Z|0-9]+/;
             const korean = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]+/;
-            if(pattern.test(document.getElementById('uid').value) != document.getElementById('uid').value) {
+            if(pattern.exec(document.getElementById('uid').value)[0] != document.getElementById('uid').value) {
                 alert("ID를 제대로 입력하십시오!");
                 return false;
             }
-            if(pattern.test(document.getElementById('pw').value) != document.getElementById('pw').value) {
+            if(pattern.exec(document.getElementById('pw').value)[0] != document.getElementById('pw').value) {
                 alert("PW를 제대로 입력하십시오!");
                 return false;
             }
-            if(korean.test(document.getElementById('name').value) != document.getElementById('name').value) {
+            if(korean.exec(document.getElementById('name').value)[0] != document.getElementById('name').value) {
                 alert("이름을 제대로 입력하십시오!");
                 return false;
             }
