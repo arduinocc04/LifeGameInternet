@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <script type="text/javascript" src="{{url_for('static', filename='qrcode.js')}}"></script>
 </head>
+
 <body>
+    <a href="/signout">로그아웃</a>
     <p>당신 ID: {{yourId}}</p>
-    <img src="{{imgSrc}}"></div>
+    <img id="qr" src="{{imgSrc}}"></div>
     <a href="{{url2}}">{{url}}</a>
 </body>
+
 </html>

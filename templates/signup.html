@@ -69,6 +69,7 @@
     <form name="signup" action="/addUser" method="POST">
         <input id="salt" name="salt" type="hidden">
         <input id="rPw" name="pw" type="hidden">
+        <input name="prev" type="hidden" value="{{prev}}">
         <fieldset>
             <legend>정보</legend>
             ID는 영어, 숫자, 한글만 입력할 수 있습니다.<br>

@@ -6,9 +6,10 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+    <a href="/signout">로그아웃</a>
     <p>당신 ID: {{yourId}}</p>
     <img id="target" src="{{url_for('static', filename=imgName)}}">
-    <a href={{ url_for('game') }}>게임으로 돌아가기</a><br>
+    <a href={{ url_for('genQrcode') }}>QR 만들기</a><br>
     <a href={{ url_for('showLeaderBoard', name=originalName) }}>리더보드로 돌아가기</a><br>
     <a href="{{ url_for('showProfile', uid=targetName) }}" id="name">이름: {{targetName}}</a><br>
     <p id="rank">순위: {{rank}}</p>

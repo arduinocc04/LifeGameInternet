@@ -8,29 +8,11 @@ import hashlib
 import random
 import string
 import urllib.request
+import json
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'lisztlacampanella'
 app.secret_key = b'liszttarantella'
-
-def makeShortUrl(originalUrl:str) -> str:
-    client_id = "pQNqIrBIaA0SRAEyWpGs" # 개발자센터에서 발급받은 Client ID 값
-    client_secret = "myLShE0xHm" # 개발자센터에서 발급받은 Client Secret 값
-    encText = urllib.parse.quote(originalUrl)
-    data = "url=" + encText
-    url = "https://openapi.naver.com/v1/util/shorturl"
-    request = urllib.request.Request(url)
-    request.add_header("Content-Type", "application/x-www-form-urlencoded")
-    request.add_header("X-Naver-Client-Id",client_id)
-    request.add_header("X-Naver-Client-Secret",client_secret)
-    response = urllib.request.urlopen(request, data=data.encode("utf-8"))
-    rescode = response.getcode()
-
-    if(rescode == 200):
-        response_body = response.read()
-        return (response_body.decode('utf-8'))
-    else:
-        return("Error Code:" + rescode)
 
 @app.route('/')
 def main():
@@ -44,13 +26,15 @@ def signout():
 
 @app.route('/signin')
 def signin():
-    return render_template('signin.html')
+    prev = request.args.get('prev')
+    return render_template('signin.html', prev=prev)
 
 @app.route('/signinUser', methods=['POST'])
 def login():
     UsMan = DbManager.UserManager()
     uid = request.form['uid']
     pw = request.form['pw']
+    prev = request.form['prev']
     tmp = UsMan.getInfo(uid)
     UsMan.closeDb()
     if tmp != None:
@@ -59,12 +43,18 @@ def login():
         result = hashlib.sha256(pw.encode()).hexdigest()
         if result == res:
             session['uid'] = uid
+            if prev: return redirect(prev)
             return redirect(url_for('showProfile', uid=uid))
     return redirect(url_for('signin'))
 
 @app.route('/signup')
 def signup():
-    return render_template('signup.html')
+    prev = request.args.get('prev')
+    return render_template('signup.html', prev = prev)
+
+@app.route('/info')
+def goNotion():
+    return redirect('https://www.notion.so/LifeGameInternet-976cac5fd76846b9b057db8b25277bcb')
 
 @app.route('/err')
 def error():
@@ -80,6 +70,7 @@ def addUser():
     salt = request.form['salt']
     uid = request.form['uid']
     pw = request.form['pw']
+    prev = request.form['prev']
     #showNs = 1 if request.form['showNs'] == 'on' else 0
     showNs = 1
     try:
@@ -89,7 +80,7 @@ def addUser():
     DbMan.uploadScore(0, uid, 0, 0, 0, 0)
     DbMan.closeDb()
     UsMan.closeDb()
-    return redirect(url_for('signin'))
+    return redirect(url_for('signin', prev=prev))
 
 @app.route('/idErr')
 def idErr():
@@ -117,9 +108,9 @@ def genQrcode():
     GmMan = DbManager.GameManger()
     GmMan.uploadGame(tmp, '', now)
     GmMan.closeDb()
-    url = "www.arduinocc04.live:8000/game?gid=" + tmp
-    imgSrc = f'http://api.qrserver.com/v1/create-qr-code/?data={url}&size=300x300'
-    return render_template('qr.html', url =url, url2="/game?gid="+tmp, imgSrc=imgSrc, yourId=session['uid'])
+    url = "http://www.arduinocc04.live:8000/game?gid=" + tmp
+    imgSrc = f'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data={url}'
+    return render_template('qr.html', url = url, url2="/game?gid="+tmp, yourId=session['uid'], imgSrc=imgSrc)
 
 @app.route('/scoreboard', methods=['GET'])
 def showScoreboard():
@@ -146,6 +137,8 @@ def showScoreboard():
 @app.route('/game', methods=['GET'])
 def game():
     gid = request.args.get('gid')
+    if not 'uid' in session:
+        return redirect(url_for('signin', prev=url_for('game', gid=gid)))
     return render_template('life.html', gid=gid, yourId=session['uid'])
 
 @app.route('/appendUser', methods=['GET'])
