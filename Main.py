@@ -130,7 +130,7 @@ def genQrcode():
     GmMan = DbManager.GameManger()
     GmMan.uploadGame(tmp, '', now)
     GmMan.closeDb()
-    url = "http://www.arduinocc04.live:8000/game?gid=" + tmp
+    url = "http://www.arduinocc04.live/game?gid=" + tmp
     imgSrc = f'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data={url}'
     return render_template('qr.html', url = url, url2="/game?gid="+tmp, yourId=session['uid'], imgSrc=imgSrc)
 
