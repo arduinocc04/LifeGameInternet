@@ -39,11 +39,13 @@ def signinId():
     prev = request.args.get('prev')
     uid = request.args.get('uid')
     UsMan = DbManager.UserManager()
-    tmp = UsMan.getSalt(uid)
+    try:
+        tmp = UsMan.getSalt(uid)
+    except:
+        return render_template('idNotExist.html')
     UsMan.closeDb()
-    if tmp != None:
-        return redirect(url_for('signinPw', prev=prev, uid=uid, salt=tmp))
-    return render_template('idNotExist.html')
+    return redirect(url_for('signinPw', prev=prev, uid=uid, salt=tmp))
+    
 
 @app.route('/signinUser', methods=['POST'])
 def login():
