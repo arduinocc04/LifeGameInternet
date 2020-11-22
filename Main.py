@@ -4,15 +4,13 @@ import ntplib
 import sqlite3
 from time import ctime
 import base64
-import hashlib
 import random
 import string
-import urllib.request
-import json
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'lisztlacampanella'
-app.secret_key = b'liszttarantella'
+with open('secret.txt', 'r', encoding='utf8') as f:
+    app.config['SECRET_KEY'] = f.readline().rstrip()
+    app.secret_key = f.readline().rstrip().encode()
 
 @app.route('/')
 def main():
@@ -27,7 +25,25 @@ def signout():
 @app.route('/signin')
 def signin():
     prev = request.args.get('prev')
-    return render_template('signin.html', prev=prev)
+    return render_template('signinId.html', prev=prev)
+
+@app.route('/signinPw')
+def signinPw():
+    prev = request.args.get('prev')
+    salt = request.args.get('salt')
+    uid = request.args.get('uid')
+    return render_template('signinPw.html', prev=prev, salt=salt, uid=uid)
+
+@app.route('/signinId', methods=['GET'])
+def signinId():
+    prev = request.args.get('prev')
+    uid = request.args.get('uid')
+    UsMan = DbManager.UserManager()
+    tmp = UsMan.getSalt(uid)
+    UsMan.closeDb()
+    if tmp != None:
+        return redirect(url_for('signinPw', prev=prev, uid=uid, salt=tmp))
+    return render_template('idNotExist.html')
 
 @app.route('/signinUser', methods=['POST'])
 def login():
@@ -35,17 +51,20 @@ def login():
     uid = request.form['uid']
     pw = request.form['pw']
     prev = request.form['prev']
-    tmp = UsMan.getInfo(uid)
+    tmp = UsMan.getPw(uid)
     UsMan.closeDb()
     if tmp != None:
-        _, res, salt, name, studentId, showNs = tmp
-        pw = pw + salt
-        result = hashlib.sha256(pw.encode()).hexdigest()
-        if result == res:
+        if pw == tmp:
             session['uid'] = uid
-            if prev: return redirect(prev)
+            if prev != "None": return redirect(prev)
             return redirect(url_for('showProfile', uid=uid))
-    return redirect(url_for('signin'))
+        else:
+            UsMan = DbManager.UserManager()
+            tmp = UsMan.getSalt(uid)
+            UsMan.closeDb()
+            return redirect(url_for('signinPw', prev=prev, salt=tmp, uid=uid))
+    else:
+        return redirect(url_for('signin'))
 
 @app.route('/signup')
 def signup():
@@ -143,7 +162,6 @@ def game():
 
 @app.route('/appendUser', methods=['GET'])
 def appendUser():
-    print('Hi!')
     gid = request.args.get('gid')
     uid = session['uid']
     # uid = request.args.get('uid')

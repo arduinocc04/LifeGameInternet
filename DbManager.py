@@ -55,7 +55,8 @@ class DbManager:
         query = f'SELECT MScore FROM Scores WHERE Name = "{name}"'
         self.c.execute(query)
         self.conn.commit()
-        return self.c.fetchone()[0]
+        try: return self.c.fetchone()[0]
+        except TypeError: return None
     
     def getMTNS(self, name:str) -> typing.Tuple:
         query = f'SELECT MTime, Name, MScore FROM Scores WHERE Name = "{name}"'
@@ -73,7 +74,8 @@ class DbManager:
         query = f'SELECT LScore FROL Scores WHERE Name = "{name}"'
         self.c.execute(query)
         self.conn.commit()
-        return self.c.fetchone()[0]
+        try: return self.c.fetchone()[0]
+        except TypeError: return None
     
     def getLTNS(self, name:str) -> typing.Tuple:
         query = f'SELECT LTime, Name, LScore FROM Scores WHERE Name = "{name}"'
@@ -153,13 +155,15 @@ class UserManager:
         query = f'SELECT PW FROM Users WHERE ID = "{uid}"'
         self.c.execute(query)
         self.conn.commit()
-        return self.c.fetchone()[0]
+        try: return self.c.fetchone()[0]
+        except TypeError: return None
 
     def getSalt(self, uid:str) -> str:
         query = f'SELECT Salt FROM Users WHERE ID = "{uid}"'
         self.c.execute(query)
         self.conn.commit()
-        return self.c.fetchone()[0]
+        try: return self.c.fetchone()[0]
+        except TypeError: return None
 
     def getInfo(self, uid:str) -> typing.Tuple:
         query = f'SELECT * FROM Users WHERE ID = "{uid}"'

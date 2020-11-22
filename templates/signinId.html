@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+    <a href="/signup">회원가입 하러 가기</a>
+    <form action="/signinId" method="GET">
+        <input name="prev" type="hidden" value="{{prev}}">
+        <fieldset>
+            <legend>ID</legend>
+            <input name="uid" type="text">
+        </fieldset>
+        <button onclick="return signinId();">다음</button>
+    </form>
+</body>
+</html>

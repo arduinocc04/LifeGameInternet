@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script type="text/javascript" src="{{url_for('static', filename='sha256.js')}}"></script>
+    <script type="text/javascript">
+        function signinPW() {
+            var form = document.signin;
+            var pw = document.getElementById('pw')
+            var salt = document.getElementById('salt').value;
+            if(pw.value == "") {
+                alert("비밀번호를 입력하십시오!");
+                return false;
+            }
+            pw.value = SHA256(pw.value + salt);
+            form.submit();
+        }
+    </script>
+</head>
+<body>
+    <input id="salt" type="hidden" value="{{salt}}">
+    <form action="/signinUser" method="POST" name="signin">
+        <input name="prev" type="hidden" value="{{prev}}">
+        <input name="uid" type="hidden" value="{{uid}}">
+        <fieldset>
+            <legend>PW</legend>
+            <input id="pw" name="pw" type="password">
+        </fieldset>
+        <button onclick="return signinPW();">로그인</button>
+    </form>
+</body>
+</html>

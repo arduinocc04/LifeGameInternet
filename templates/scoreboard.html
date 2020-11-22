@@ -37,7 +37,7 @@
 	<p>당신 ID: {{yourId}}</p>
 	<a href={{ url_for('game', gid=gid) }}>게임으로 돌아가기</a>
 	<button onclick="findMine(event)">내 점수 보기</button>
-	<a href="{{ url_for('showLeaderBoard') }}">리더보드 보기</a>
+	<a href="{{ url_for('showLeaderBoard', name=name) }}">리더보드 보기</a>
 	<table class="BgAnd2Way">
 		<thead>
 			<th>순위</th>

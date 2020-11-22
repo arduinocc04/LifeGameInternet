@@ -1,5 +1,7 @@
 import os
 import DbManager
+import random
+import string
 def setup():
     if(not os.path.isdir('./static/image')): os.mkdir('./static/image')
     cmd = int(input("Del Score Db? yes->1 no->0 >>>"))
@@ -20,6 +22,15 @@ def setup():
         DbMan = DbManager.GameManger()
         DbMan.makeDb()
         DbMan.closeDb()
+
+    tmp = ''
+    tmp2 = ''
+    for _ in range(10):
+        tmp += random.choice(string.ascii_letters)
+        tmp2 += random.choice(string.ascii_letters)
+    with open('secret.txt', 'wb', encoding='utf8') as f:
+        f.write(tmp + '\n')
+        f.write(tmp2 + '\n')
 
 if __name__ == '__main__':
     setup()
