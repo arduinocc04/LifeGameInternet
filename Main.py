@@ -181,9 +181,9 @@ def uploadScore():
     jsonData = request.get_json()
     name = session['uid']
     #name = jsonData['name']
-    mCellCnt = int(ekn.match(jsonData['mCellCnt']).group())
-    frame = int(ekn.match(jsonData['frame']).group())
-    delayedTime = float(ekn.match(jsonData['delayedTime']).group())
+    mCellCnt = int(jsonData['mCellCnt'])
+    frame = int(jsonData['frame'])
+    delayedTime = float(jsonData['delayedTime'])
     score = float(jsonData['score'])
     img = base64.b64decode(jsonData['image'][22:])
 
@@ -220,7 +220,7 @@ def showImage():
     originalName = ekn.match(request.args.get('originalName')).group()
     time = request.args.get('time')
     score = float(request.args.get('score'))
-    rank = int(ekn.match(request.args.get('rank')).group())
+    rank = int(request.args.get('rank'))
     DbMan = DbManager.DbManager()
     _, _, _, mCellCnt, frame, delayedTime = DbMan.getMRawInfo(name)
     return render_template('image.html', targetName = name, originalName=originalName, time=time, score=score, rank=rank, imgName=f'image/{name}.jpg', mCellCnt=mCellCnt, frame=frame, delayedTime=delayedTime, yourId=session['uid'])
@@ -232,7 +232,7 @@ def showImageScore():
     originalName = ekn.match(request.args.get('originalName')).group()
     time = request.args.get('time')
     score = float(request.args.get('score'))
-    rank = int(ekn.match(request.args.get('rank')).group())
+    rank = int(request.args.get('rank'))
     DbMan = DbManager.DbManager()
     _, _, _, mCellCnt, frame, delayedTime = DbMan.getLRawInfo(name)
     return render_template('image_score.html', targetName = name, originalName=originalName, time=time, score=score, rank=rank, imgName=f'image/{name}_last.jpg', mCellCnt=mCellCnt, frame=frame, delayedTime=delayedTime, gid=gid, yourId=session['uid'])
