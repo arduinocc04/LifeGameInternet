@@ -28,7 +28,7 @@ def setup():
     for _ in range(10):
         tmp += random.choice(string.ascii_letters)
         tmp2 += random.choice(string.ascii_letters)
-    with open('secret.txt', 'wb', encoding='utf8') as f:
+    with open('secret.txt', 'w', encoding='utf8') as f:
         f.write(tmp + '\n')
         f.write(tmp2 + '\n')
 
