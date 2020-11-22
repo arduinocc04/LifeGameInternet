@@ -6,11 +6,14 @@ from time import ctime
 import base64
 import random
 import string
+import re
 
 app = Flask(__name__)
 with open('secret.txt', 'r', encoding='utf8') as f:
     app.config['SECRET_KEY'] = f.readline().rstrip()
     app.secret_key = f.readline().rstrip().encode()
+
+ekn = re.compile('[a-zA-Zㄱ-ㅎ가-힣\d]+')
 
 @app.route('/')
 def main():
@@ -29,15 +32,15 @@ def signin():
 
 @app.route('/signinPw')
 def signinPw():
-    prev = request.args.get('prev')
-    salt = request.args.get('salt')
-    uid = request.args.get('uid')
+    prev = ekn.match(request.args.get('prev')).group()
+    salt = ekn.match(request.args.get('salt')).group()
+    uid = ekn.match(request.args.get('uid')).group()
     return render_template('signinPw.html', prev=prev, salt=salt, uid=uid)
 
 @app.route('/signinId', methods=['GET'])
 def signinId():
     prev = request.args.get('prev')
-    uid = request.args.get('uid')
+    uid = ekn.match(request.args.get('uid')).group()
     UsMan = DbManager.UserManager()
     tmp = UsMan.getSalt(uid)
     if tmp == None: return render_template('idNotExist.html')
@@ -48,7 +51,7 @@ def signinId():
 @app.route('/signinUser', methods=['POST'])
 def login():
     UsMan = DbManager.UserManager()
-    uid = request.form['uid']
+    uid = ekn.match(request.form['uid']).group()
     pw = request.form['pw']
     prev = request.form['prev']
     tmp = UsMan.getPw(uid)
@@ -84,11 +87,11 @@ def addUser():
     print(request.form)
     UsMan = DbManager.UserManager()
     DbMan = DbManager.DbManager()
-    name = request.form['name']
-    studentId = int(request.form['studentId'])
-    salt = request.form['salt']
-    uid = request.form['uid']
-    pw = request.form['pw']
+    name = ekn.match(request.form['name']).group()
+    studentId = int(ekn.match(request.form['studentId']).group())
+    salt = ekn.match(request.form['salt']).group()
+    uid = ekn.match(request.form['uid']).group()
+    pw = ekn.match(request.form['pw']).group()
     prev = request.form['prev']
     #showNs = 1 if request.form['showNs'] == 'on' else 0
     showNs = 1
@@ -107,7 +110,7 @@ def idErr():
 
 @app.route('/profile', methods=['GET'])
 def showProfile():
-    uid = request.args.get('uid')
+    uid = ekn.match(request.args.get('uid')).group()
     UsMan = DbManager.UserManager()
     DbMan = DbManager.DbManager()
     tmp = UsMan.getInfo(uid)
@@ -135,8 +138,7 @@ def genQrcode():
 def showScoreboard():
     GmMan = DbManager.GameManger()
     DbMan = DbManager.DbManager()
-    gid = request.args.get('gid')
-    name = session['uid']
+    gid = ekn.match(request.args.get('gid')).group()
     name = request.args.get('name')
     tmp = GmMan.getInfo(gid)
     if tmp == None: return redirect(url_for('error'))
@@ -155,14 +157,14 @@ def showScoreboard():
 
 @app.route('/game', methods=['GET'])
 def game():
-    gid = request.args.get('gid')
+    gid = ekn.match(request.args.get('gid')).group()
     if not 'uid' in session:
         return redirect(url_for('signin', prev=url_for('game', gid=gid)))
     return render_template('life.html', gid=gid, yourId=session['uid'])
 
 @app.route('/appendUser', methods=['GET'])
 def appendUser():
-    gid = request.args.get('gid')
+    gid = ekn.match(request.args.get('gid')).group()
     uid = session['uid']
     # uid = request.args.get('uid')
     print(f'gid:{gid}uid:{uid}')
@@ -179,9 +181,9 @@ def uploadScore():
     jsonData = request.get_json()
     name = session['uid']
     #name = jsonData['name']
-    mCellCnt = int(jsonData['mCellCnt'])
-    frame = int(jsonData['frame'])
-    delayedTime = float(jsonData['delayedTime'])
+    mCellCnt = int(ekn.match(jsonData['mCellCnt']).group())
+    frame = int(ekn.match(jsonData['frame']).group())
+    delayedTime = float(ekn.match(jsonData['delayedTime']).group())
     score = float(jsonData['score'])
     img = base64.b64decode(jsonData['image'][22:])
 
@@ -199,7 +201,7 @@ def uploadScore():
 
 @app.route('/leaderboard', methods = ['GET'])
 def showLeaderBoard():
-    name = request.args.get('name')
+    name = ekn.match(request.args.get('name')).group()
     DbMan = DbManager.DbManager()
     tmp = DbMan.getMTNSAll()
     DbMan.closeDb()
@@ -214,23 +216,23 @@ def showLeaderBoard():
 
 @app.route('/image', methods = ['GET'])
 def showImage():
-    name = request.args.get('name')
-    originalName = request.args.get('originalName')
+    name = ekn.match(request.args.get('name')).group()
+    originalName = ekn.match(request.args.get('originalName')).group()
     time = request.args.get('time')
     score = float(request.args.get('score'))
-    rank = int(request.args.get('rank'))
+    rank = int(ekn.match(request.args.get('rank')).group())
     DbMan = DbManager.DbManager()
     _, _, _, mCellCnt, frame, delayedTime = DbMan.getMRawInfo(name)
     return render_template('image.html', targetName = name, originalName=originalName, time=time, score=score, rank=rank, imgName=f'image/{name}.jpg', mCellCnt=mCellCnt, frame=frame, delayedTime=delayedTime, yourId=session['uid'])
 
 @app.route('/imageScore', methods = ['GET'])
 def showImageScore():
-    name = request.args.get('name')
-    gid = request.args.get('gid')
-    originalName = request.args.get('originalName')
+    name = ekn.match(request.args.get('name')).group()
+    gid = ekn.match(request.args.get('gid')).group()
+    originalName = ekn.match(request.args.get('originalName')).group()
     time = request.args.get('time')
     score = float(request.args.get('score'))
-    rank = int(request.args.get('rank'))
+    rank = int(ekn.match(request.args.get('rank')).group())
     DbMan = DbManager.DbManager()
     _, _, _, mCellCnt, frame, delayedTime = DbMan.getLRawInfo(name)
     return render_template('image_score.html', targetName = name, originalName=originalName, time=time, score=score, rank=rank, imgName=f'image/{name}_last.jpg', mCellCnt=mCellCnt, frame=frame, delayedTime=delayedTime, gid=gid, yourId=session['uid'])
