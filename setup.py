@@ -2,8 +2,10 @@ import os
 import DbManager
 import random
 import string
+import shutil
 def setup():
-    if(not os.path.isdir('./static/image')): os.mkdir('./static/image')
+    if(os.path.isdir('./static/image')): shutil.rmtree('./static/image')
+    os.mkdir('./static/image')
     cmd = int(input("Del Score Db? yes->1 no->0 >>>"))
     if cmd == 1:
         if(os.path.isfile('./Data.db')): os.remove('./Data.db')
